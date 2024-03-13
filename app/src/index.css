@@ -72,5 +72,6 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-color: hsl(240 10% 3.9%);
   }
 }

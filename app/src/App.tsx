@@ -1,11 +1,14 @@
-import { Button } from "./components/ui/button"
+import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import Home from "./routes/Home"
 
 function App() {
-  return (
-    <> 
-      <Button>BATMAN</Button>
-    </>
-  )
+    const BrowserRouter = createBrowserRouter([
+        { path: '/', element: <Home /> }
+    ])
+
+    return (
+        <RouterProvider router={BrowserRouter}/>
+    )
 }
 
 export default App
