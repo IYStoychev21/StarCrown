@@ -24,7 +24,7 @@ func main() {
 	router.GET("/auth/google/callback", handlers.HandleGoogleCallback)
 	router.GET("/protected", authMiddleware, handlers.ProtectedHandler)
 
-	router.Run(":3000")
+	router.Run()
 }
 
 func authMiddleware(c *gin.Context) {

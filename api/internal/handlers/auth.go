@@ -9,6 +9,8 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
+var globaEmail string
+
 func setupGoogleOAuthConfig() *oauth2.Config {
 	return &oauth2.Config{
 		RedirectURL:  os.Getenv("REDIRECTURL"),
@@ -43,5 +45,5 @@ func HandleGoogleCallback(c *gin.Context) {
 }
 
 func ProtectedHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": "This is a protected route"})
+	c.JSON(http.StatusOK, gin.H{"message": globaEmail})
 }
