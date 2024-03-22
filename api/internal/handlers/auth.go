@@ -9,8 +9,6 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
-var globaEmail string
-
 func setupGoogleOAuthConfig() *oauth2.Config {
 	return &oauth2.Config{
 		RedirectURL:  os.Getenv("REDIRECTURL"),
@@ -41,9 +39,9 @@ func HandleGoogleCallback(c *gin.Context) {
 
 	c.SetCookie("access_token", token.AccessToken, 3600, "/", "", false, true)
 
-	c.Redirect(http.StatusFound, "/protected")
+	c.Redirect(http.StatusFound, "http://localhost:5173/finalize")
 }
 
-func ProtectedHandler(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"message": globaEmail})
+func AuthHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"message": "You are authenticated"})
 }

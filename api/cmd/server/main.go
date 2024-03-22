@@ -6,6 +6,7 @@ import (
 
 	"github.com/IYStoychev21/star-crown/api/internal/handlers"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -18,11 +19,20 @@ func main() {
 
 	router := gin.Default()
 
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowMethods:     []string{"PUT", "PATCH", "GET", "POST", "DELETE"},
+		AllowHeaders:     []string{"Origin"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * 60,
+	}))
+
 	router.GET("/", handlers.IndexHandler)
 
 	router.GET("/login", handlers.HandleLoging)
 	router.GET("/auth/google/callback", handlers.HandleGoogleCallback)
-	router.GET("/protected", authMiddleware, handlers.ProtectedHandler)
+	router.GET("/auth", authMiddleware, handlers.AuthHandler)
 
 	router.Run()
 }
