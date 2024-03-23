@@ -6,7 +6,11 @@ export default function Protected({children}: any) {
     let [isLoggedIn, setIsLoggedIn] = useState(true);
     
     useEffect(() => {
-        axios.get(`${import.meta.env.VITE_BACKEND_URL}/user`, {withCredentials: true}).then(() => {
+        axios.get(`${import.meta.env.VITE_BACKEND_URL}/user`, {
+            headers: {
+                Authorization: `${localStorage.getItem('token')}`
+            }
+        }).then(() => {
             setIsLoggedIn(true)
         }).catch(() => {
             setIsLoggedIn(false)

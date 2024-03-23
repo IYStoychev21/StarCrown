@@ -27,6 +27,8 @@ func HandleLoging(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
+var googleToken *oauth2.Token
+
 func HandleGoogleCallback(c *gin.Context) {
 	code := c.Query("code")
 
@@ -38,9 +40,17 @@ func HandleGoogleCallback(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("access_token", token.AccessToken, 3600, "/", "", false, true)
+	googleToken = token
 
-	c.Redirect(http.StatusFound, "http://localhost:5173/library")
+	if os.Getenv("MODE") == "dev" {
+		c.Redirect(http.StatusTemporaryRedirect, "http://localhost:5173/login/success")
+	} else {
+		c.Redirect(http.StatusTemporaryRedirect, "https://tauri.localhost/login/success")
+	}
+}
+
+func GetToken(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"token": googleToken.AccessToken})
 }
 
 type User struct {
@@ -52,11 +62,7 @@ type User struct {
 }
 
 func UserHandler(c *gin.Context) {
-	token, err := c.Cookie("access_token")
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-		return
-	}
+	token := c.Request.Header.Get("Authorization")
 
 	resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token)
 	if err != nil {

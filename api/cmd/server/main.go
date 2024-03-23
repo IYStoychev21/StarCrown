@@ -20,9 +20,9 @@ func main() {
 	router := gin.Default()
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowOrigins:     []string{"http://localhost:5173", "https://tauri.localhost"},
 		AllowMethods:     []string{"PUT", "PATCH", "GET", "POST", "DELETE"},
-		AllowHeaders:     []string{"Origin"},
+		AllowHeaders:     []string{"Origin", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * 60,
@@ -33,16 +33,16 @@ func main() {
 	router.GET("/login", handlers.HandleLoging)
 	router.GET("/auth/google/callback", handlers.HandleGoogleCallback)
 	router.GET("/user", authMiddleware, handlers.UserHandler)
+	router.GET("/token", handlers.GetToken)
 
 	router.Run()
 }
 
 func authMiddleware(c *gin.Context) {
-	_, err := c.Request.Cookie("access_token")
+	auth := c.Request.Header.Get("Authorization")
 
-	if err != nil {
-		c.Redirect(http.StatusFound, "/login")
-		c.Abort()
+	if auth == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 

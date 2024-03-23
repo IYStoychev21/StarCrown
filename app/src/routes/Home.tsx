@@ -1,5 +1,4 @@
 import { Button } from '../components/ui/button'
-import axios from 'axios'
 
 export default function Home() {
     const handleLogin = () => {
