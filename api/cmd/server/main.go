@@ -32,7 +32,7 @@ func main() {
 
 	router.GET("/login", handlers.HandleLoging)
 	router.GET("/auth/google/callback", handlers.HandleGoogleCallback)
-	router.GET("/auth", authMiddleware, handlers.AuthHandler)
+	router.GET("/user", authMiddleware, handlers.UserHandler)
 
 	router.Run()
 }
