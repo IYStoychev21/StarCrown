@@ -1,16 +1,12 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import { userAPI } from '../apis/userAPI';
 
 export default function Protected({children}: any) { 
     let [isLoggedIn, setIsLoggedIn] = useState(true);
     
     useEffect(() => {
-        axios.get(`${import.meta.env.VITE_BACKEND_URL}/user`, {
-            headers: {
-                Authorization: `${localStorage.getItem('token')}`
-            }
-        }).then(() => {
+        userAPI.getCurrentUser().then(() => {
             setIsLoggedIn(true)
         }).catch(() => {
             setIsLoggedIn(false)

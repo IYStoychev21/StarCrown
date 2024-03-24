@@ -41,7 +41,7 @@ func main() {
 func authMiddleware(c *gin.Context) {
 	auth := c.Request.Header.Get("Authorization")
 
-	if auth == "" {
+	if auth == "null" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
