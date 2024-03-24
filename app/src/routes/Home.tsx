@@ -1,9 +1,24 @@
+import { useEffect } from 'react'
 import { Button } from '../components/ui/button'
+import { createDir, BaseDirectory, writeTextFile } from '@tauri-apps/api/fs';
 
 export default function Home() {
     const handleLogin = () => {
         window.location.href = import.meta.env.VITE_BACKEND_URL + '/login'
     }
+
+    const createConfigDirectory = async () => {
+        try {
+            await createDir('StarCrown', { dir: BaseDirectory.Document, recursive: true });
+            await writeTextFile('StarCrown/library.json', JSON.stringify({}), { dir: BaseDirectory.Document });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    useEffect(() => {
+        createConfigDirectory();
+    }, [])
 
     return (
         <>
