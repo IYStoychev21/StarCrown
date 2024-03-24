@@ -16,6 +16,12 @@
       "fs": {
         "all": true,
         "scope": ["**", "**/*", "/**/*"]
+      },
+      "dialog": {
+        "all": true
+      },
+      "path": {
+        "all": true
       }
     },
     "bundle": {

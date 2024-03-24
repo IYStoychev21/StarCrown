@@ -6,3 +6,8 @@ export type User = {
     pic: string
     email: string
 };
+
+export type Game = {
+    appid: number
+    name: string
+};

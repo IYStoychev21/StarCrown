@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/IYStoychev21/star-crown/api/internal/handlers"
+	"github.com/IYStoychev21/star-crown/api/internal/steam"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -34,6 +35,7 @@ func main() {
 	router.GET("/auth/google/callback", handlers.HandleGoogleCallback)
 	router.GET("/user", authMiddleware, handlers.UserHandler)
 	router.GET("/token", handlers.GetToken)
+	router.GET("/games", steam.GetSteamGames)
 
 	router.Run()
 }

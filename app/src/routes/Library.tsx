@@ -1,8 +1,9 @@
 import Nav from '../components/Nav'
 import { userAPI } from '@/apis/userAPI'
+import { gamesAPI } from '@/apis/gamesAPI'
 import { useState, useEffect } from 'react'
 import { Separator } from '@/components/ui/separator'
-import { User } from '@/shared.types'
+import { User, Game } from '@/shared.types'
 import {
   Dialog,
   DialogContent,
@@ -12,18 +13,59 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import NewGame from '@/components/NewGame'
+import { Input } from '@/components/ui/input'
+import { open } from '@tauri-apps/api/dialog'
+import { Button } from '@/components/ui/button'
 
 export default function Library() {
     let [userInfo, setUserInfo] = useState<User>()
-    const [open, setOpen] = useState(false)
-    const [value, setValue] = useState(0)
-    const [games, setGames] = useState([{"appid":2777010,"name":"The Thaumaturge: Digital Deluxe Content"},{"appid":2777020,"name":"WarSphere - The Worthy Branch"},{"appid":2777030,"name":"In The Shadows"},{"appid":2777050,"name":"Pyrene Demo"},{"appid":2777060,"name":"Impulse Rogue Demo"},{"appid":2777070,"name":"Medieval Questionnaire"},{"appid":2776090,"name":"Lay of the Land"},{"appid":2776100,"name":"Power Network Tycoon Demo"},{"appid":2776130,"name":"Wijita: City of Makers"},{"appid":2776140,"name":"Ctrl Alt Destroy Demo"},{"appid":2776170,"name":"Shores of Plunder Demo"}])
+    const [allGames, setAllGames] = useState<Game[]>([])
+
+    const [nameValue, setNameValue] = useState('')
+    const [suggestedGames, setSuggestedGames] = useState([])
+
+    const [idValue, setIdValue] = useState(0)
+
+    const [showGameSuggestion, setShowGameSuggestion] = useState(false)
+
+    const [gameSavesPath, setGameSavesPath] = useState('')
 
     useEffect(() => {
         userAPI.getCurrentUser().then((user) => {
             setUserInfo(user)
         })
+
+        gamesAPI.getGames().then((games: any) => {
+            setAllGames(games)
+        })
     }, [])
+
+    const onSearch = () => {
+        if (nameValue.length === 0) {
+            setSuggestedGames([])
+            return
+        }
+
+        for (let i = 0; i < allGames.length; i++) {
+            if (allGames[i].name.toLowerCase().replace(/\s/g, '').includes(nameValue.toLowerCase().replace(/\s/g, ''))) {
+                setSuggestedGames([allGames[i - 1], allGames[i], allGames[i + 1], allGames[i + 2], allGames[i + 3]])
+            }
+        }
+    }
+
+    function selectGameSavesLocation() {
+        open({
+            directory: true,
+            multiple: false
+        }).then((path) => {
+            if (path) {
+                setGameSavesPath(path)
+                console.log(path)
+            } else {
+                return
+            }
+        })
+    }
 
     return (
         <>
@@ -47,6 +89,37 @@ export default function Library() {
                                     <DialogTitle className='text-white'>Add New Game</DialogTitle>
                                     <DialogDescription>Choose a game to add to your library</DialogDescription>
                                 </DialogHeader>
+
+                                <div className='relative flex flex-col gap-4'>
+                                    <div className='flex gap-4'>
+                                        <Input className='text-white' value={nameValue} placeholder='Enter game name' onChange={(e) => {
+                                            setNameValue(e.target.value);
+                                            if (e.target.value.length > 0) {
+                                                setShowGameSuggestion(true)
+                                            } else {
+                                                setShowGameSuggestion(false)
+                                            }
+                                            }} />
+                                        <Button onClick={onSearch}>Search Game</Button>
+                                    </div>
+                                        
+                                    <div className={`flex scroll flex-col ${showGameSuggestion? 'relative': 'hidden'} w-full`}>
+                                        {suggestedGames.map((game) => {
+                                            return (
+                                                <button className={`bg-gray-800 w-full hover:bg-gray-600 duration-150 text-white px-3 py-1`} onClick={() => {
+                                                    setIdValue(game.appid);
+                                                    setNameValue(game.name);
+                                                    setShowGameSuggestion(false);
+                                                    setSuggestedGames([]);
+                                                }}>{game.name}</button>
+                                            )
+                                        })}
+                                        <button className={`bg-gray-800 w-full hover:bg-gray-600 duration-150 text-white px-3 py-1`}>Can't find your game</button>
+                                    </div>
+
+                                    <Button onClick={selectGameSavesLocation}>Select Saves Location</Button>
+                                    {idValue && <Button>Add Game</Button>}
+                                </div>
                             </DialogContent>
                         </Dialog>
 
