@@ -10,10 +10,10 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar"
 
 
-export default function Nav({ avaratImage, userName }: { avaratImage: string, userName: string }) {
+export default function Nav({ avaratImage, userName }: { avaratImage: string | undefined, userName: string | undefined}) {
     return (
         <>
-            <div className="text-white mt-4 ml-8 relative">
+            <div className="text-white ml-8 relative h-14 flex items-center">
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>
@@ -22,11 +22,11 @@ export default function Nav({ avaratImage, userName }: { avaratImage: string, us
                     </BreadcrumbList> 
                 </Breadcrumb>
 
-                <div className="absolute right-4 top-0 flex text-white items-center justify-center gap-4">
+                <div className="absolute right-4 flex text-white items-center justify-center gap-4">
                     <h1 className="font-bold">{userName}</h1>
                     <Avatar>
                         <AvatarImage src={avaratImage} alt="avatar" />
-                        <AvatarFallback className="bg-blue-400">{userName[0]}</AvatarFallback>
+                        {userName && <AvatarFallback className="bg-blue-400">{userName[0]}</AvatarFallback>}
                     </Avatar>
                 </div>
             </div>
