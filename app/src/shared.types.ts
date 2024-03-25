@@ -1,5 +1,5 @@
 
-export type User = {
+export type UserType = {
     name: string
     first: string
     last: string
@@ -7,12 +7,12 @@ export type User = {
     email: string
 };
 
-export type Game = {
+export type GameType = {
     appid: number
     name: string
 };
 
-export type GameSave = {
+export type GameSaveType = {
     gameId: number,
     gameName: string,
     path: string

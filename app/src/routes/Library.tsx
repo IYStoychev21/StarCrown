@@ -3,7 +3,7 @@ import { userAPI } from '@/apis/userAPI'
 import { gamesAPI } from '@/apis/gamesAPI'
 import { useState, useEffect } from 'react'
 import { Separator } from '@/components/ui/separator'
-import { User, Game, GameSave} from '@/shared.types'
+import { UserType, GameType, GameSaveType} from '@/shared.types'
 import {
   Dialog,
   DialogContent,
@@ -17,11 +17,13 @@ import { Input } from '@/components/ui/input'
 import { open } from '@tauri-apps/api/dialog'
 import { Button } from '@/components/ui/button'
 import { readTextFile, BaseDirectory, writeTextFile } from '@tauri-apps/api/fs'
+import GameSave from '@/components/GameSave'
+import { convertNumberToCol } from '@/utils/numToCol'
 
 export default function Library() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const [userInfo, setUserInfo] = useState<User>()
-    const [allGames, setAllGames] = useState<Game[]>([])
+    const [userInfo, setUserInfo] = useState<UserType>()
+    const [allGames, setAllGames] = useState<GameType[]>([])
 
     const [nameValue, setNameValue] = useState('')
     const [suggestedGames, setSuggestedGames] = useState([])
@@ -32,7 +34,7 @@ export default function Library() {
 
     const [gameSavesPath, setGameSavesPath] = useState('')
 
-    const [games, setGames] = useState<GameSave[]>([])
+    const [games, setGames] = useState<GameSaveType[]>([])
 
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
@@ -50,6 +52,7 @@ export default function Library() {
         })
 
         readTextFile('StarCrown/library.json', { dir: BaseDirectory.Document }).then((data) => {
+            console.log(data)
             setGames(JSON.parse(data))
         })
     }, [])
@@ -75,7 +78,7 @@ export default function Library() {
     }
 
     function handleNewGame() {
-        let newGame: GameSave = {
+        let newGame: GameSaveType = {
             gameId: idValue,
             gameName: nameValue,
             path: gameSavesPath
@@ -108,9 +111,17 @@ export default function Library() {
                 </div>
 
                 <div className='text-white font-bold ml-8 mt-3 flex flex-col gap3'>
-                    <h1 className='text-3xl'>Your Library</h1>
+                    <h1 className='text-3xl'>Your Save Library</h1>
 
-                    <div className='mt-20'>
+                    <div className={`mt-20 grid ${ convertNumberToCol(Math.floor(window.innerWidth / 230))} gap-5`}>
+                        {
+                            games.map((game) => {
+                                return (
+                                    <GameSave gameId={game.gameId} />
+                                )
+                            })
+                        }
+
                         <Dialog open={isDialogOpen}>
                             <DialogTrigger >
                                 <NewGame clickHandler={() => setIsDialogOpen(true)} />

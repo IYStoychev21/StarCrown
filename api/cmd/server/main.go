@@ -36,6 +36,7 @@ func main() {
 	router.GET("/user", authMiddleware, handlers.UserHandler)
 	router.GET("/token", handlers.GetToken)
 	router.GET("/games", steam.GetSteamGames)
+	router.GET("/games/:appid", steam.GetGameInfo)
 
 	router.Run()
 }

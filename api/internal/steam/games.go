@@ -26,3 +26,23 @@ func GetSteamGames(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, data)
 }
+
+func GetGameInfo(c *gin.Context) {
+	appid := c.Param("appid")
+	url := fmt.Sprintf("http://store.steampowered.com/api/appdetails?appids=%s", appid)
+	resp, err := http.Get(url)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	defer resp.Body.Close()
+	var data map[string]interface{}
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, data[appid])
+}
