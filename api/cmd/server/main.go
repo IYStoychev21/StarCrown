@@ -35,8 +35,8 @@ func main() {
 	router.GET("/auth/google/callback", handlers.HandleGoogleCallback)
 	router.GET("/user", authMiddleware, handlers.UserHandler)
 	router.GET("/token", handlers.GetToken)
-	router.GET("/games", steam.GetSteamGames)
-	router.GET("/games/:appid", steam.GetGameInfo)
+	router.GET("/games", authMiddleware, steam.GetSteamGames)
+	router.GET("/games/:appid", authMiddleware, steam.GetGameInfo)
 
 	router.Run()
 }

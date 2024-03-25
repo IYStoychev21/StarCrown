@@ -51,6 +51,7 @@ func HandleGoogleCallback(c *gin.Context) {
 
 func GetToken(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": googleToken.AccessToken})
+	googleToken = nil
 }
 
 type User struct {

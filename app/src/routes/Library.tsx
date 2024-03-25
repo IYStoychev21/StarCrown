@@ -50,7 +50,6 @@ export default function Library() {
         })
 
         readTextFile('StarCrown/library.json', { dir: BaseDirectory.Document }).then((data) => {
-            console.log(data)
             setGames(JSON.parse(data))
         })
     }, [])
