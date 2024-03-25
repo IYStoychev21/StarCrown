@@ -11,3 +11,9 @@ export type Game = {
     appid: number
     name: string
 };
+
+export type GameSave = {
+    gameId: number,
+    gameName: string,
+    path: string
+};

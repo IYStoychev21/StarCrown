@@ -3,7 +3,7 @@ import { userAPI } from '@/apis/userAPI'
 import { gamesAPI } from '@/apis/gamesAPI'
 import { useState, useEffect } from 'react'
 import { Separator } from '@/components/ui/separator'
-import { User, Game } from '@/shared.types'
+import { User, Game, GameSave} from '@/shared.types'
 import {
   Dialog,
   DialogContent,
@@ -16,9 +16,11 @@ import NewGame from '@/components/NewGame'
 import { Input } from '@/components/ui/input'
 import { open } from '@tauri-apps/api/dialog'
 import { Button } from '@/components/ui/button'
+import { readTextFile, BaseDirectory, writeTextFile } from '@tauri-apps/api/fs'
 
 export default function Library() {
-    let [userInfo, setUserInfo] = useState<User>()
+    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [userInfo, setUserInfo] = useState<User>()
     const [allGames, setAllGames] = useState<Game[]>([])
 
     const [nameValue, setNameValue] = useState('')
@@ -30,6 +32,14 @@ export default function Library() {
 
     const [gameSavesPath, setGameSavesPath] = useState('')
 
+    const [games, setGames] = useState<GameSave[]>([])
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            setIsDialogOpen(false)
+        }
+    })
+
     useEffect(() => {
         userAPI.getCurrentUser().then((user) => {
             setUserInfo(user)
@@ -38,7 +48,16 @@ export default function Library() {
         gamesAPI.getGames().then((games: any) => {
             setAllGames(games)
         })
+
+        readTextFile('StarCrown/library.json', { dir: BaseDirectory.Document }).then((data) => {
+            setGames(JSON.parse(data))
+        })
     }, [])
+
+    useEffect(() => {
+        writeTextFile('StarCrown/library.json', JSON.stringify(games), { dir: BaseDirectory.Document })
+        setIsDialogOpen(false)
+    }, [games])
 
     const onSearch = () => {
         if (nameValue.length === 0) {
@@ -51,6 +70,18 @@ export default function Library() {
                 setSuggestedGames([allGames[i - 1], allGames[i], allGames[i + 1], allGames[i + 2], allGames[i + 3]])
             }
         }
+
+        setShowGameSuggestion(true)
+    }
+
+    function handleNewGame() {
+        let newGame: GameSave = {
+            gameId: idValue,
+            gameName: nameValue,
+            path: gameSavesPath
+        }
+
+        setGames([...games, newGame])
     }
 
     function selectGameSavesLocation() {
@@ -80,9 +111,9 @@ export default function Library() {
                     <h1 className='text-3xl'>Your Library</h1>
 
                     <div className='mt-20'>
-                        <Dialog>
-                            <DialogTrigger>
-                                <NewGame />
+                        <Dialog open={isDialogOpen}>
+                            <DialogTrigger >
+                                <NewGame clickHandler={() => setIsDialogOpen(true)} />
                             </DialogTrigger>
                             <DialogContent className='dark'>
                                 <DialogHeader>
@@ -94,16 +125,12 @@ export default function Library() {
                                     <div className='flex gap-4'>
                                         <Input className='text-white' value={nameValue} placeholder='Enter game name' onChange={(e) => {
                                             setNameValue(e.target.value);
-                                            if (e.target.value.length > 0) {
-                                                setShowGameSuggestion(true)
-                                            } else {
                                                 setShowGameSuggestion(false)
-                                            }
                                             }} />
                                         <Button onClick={onSearch}>Search Game</Button>
                                     </div>
                                         
-                                    <div className={`flex scroll flex-col ${showGameSuggestion? 'relative': 'hidden'} w-full`}>
+                                    <div className={`flex scroll mt-8 flex-col ${showGameSuggestion? 'absolute': 'hidden'} w-full`}>
                                         {suggestedGames.map((game) => {
                                             return (
                                                 <button className={`bg-gray-800 w-full hover:bg-gray-600 duration-150 text-white px-3 py-1`} onClick={() => {
@@ -114,11 +141,10 @@ export default function Library() {
                                                 }}>{game.name}</button>
                                             )
                                         })}
-                                        <button className={`bg-gray-800 w-full hover:bg-gray-600 duration-150 text-white px-3 py-1`}>Can't find your game</button>
                                     </div>
 
                                     <Button onClick={selectGameSavesLocation}>Select Saves Location</Button>
-                                    {idValue && <Button>Add Game</Button>}
+                                    {idValue && <Button onClick={handleNewGame}>Add Game</Button>}
                                 </div>
                             </DialogContent>
                         </Dialog>
