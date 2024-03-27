@@ -7,7 +7,7 @@ import LoginSuccessful from "./routes/LoginSuccessful"
 function App() {
     const BrowserRouter = createBrowserRouter([
         { path: '/', element: <Home /> },
-        { path: '/library', element: <Protected><Library /></Protected> },
+        { path: '/library', element: <Protected> <Library /> </Protected> },
         { path: '/login/success', element: <LoginSuccessful /> },
     ])
 

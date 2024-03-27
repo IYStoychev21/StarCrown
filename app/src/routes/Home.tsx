@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { Button } from '../components/ui/button'
-import { createDir, BaseDirectory, writeTextFile, exists } from '@tauri-apps/api/fs';
+import { createDir, BaseDirectory } from '@tauri-apps/api/fs';
 
 export default function Home() {
     const handleLogin = () => {
@@ -10,11 +10,6 @@ export default function Home() {
     const createConfigDirectory = async () => {
         try {
             await createDir('StarCrown', { dir: BaseDirectory.Document, recursive: true });
-
-            if (await exists('StarCrown/library.json', { dir: BaseDirectory.Document }) === false)
-            {
-                await writeTextFile('StarCrown/library.json', JSON.stringify([]), { dir: BaseDirectory.Document });
-            }
         } catch (error) {
             console.error(error);
         }

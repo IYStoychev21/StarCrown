@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { readTextFile, BaseDirectory, writeTextFile } from '@tauri-apps/api/fs'
 import GameSave from '@/components/GameSave'
 import { convertNumberToCol } from '@/utils/numToCol'
+import { googleDriveAPI } from '@/apis/googleDriveAPI'
 
 export default function Library() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -49,9 +50,13 @@ export default function Library() {
             setAllGames(games)
         })
 
-        readTextFile('StarCrown/library.json', { dir: BaseDirectory.Document }).then((data) => {
-            setGames(JSON.parse(data))
-        })
+        googleDriveAPI.initGoogleConfig().then(() => {})
+
+        if (games.length === 0) {
+            readTextFile('StarCrown/library.json', { dir: BaseDirectory.Document }).then((data) => {
+                setGames(JSON.parse(data))
+            })
+        }
     }, [])
 
     useEffect(() => {

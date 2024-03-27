@@ -5,3 +5,10 @@ export const axiosConfig = {
         'Authorization': localStorage.getItem('token')
     }
 }
+
+export const axiosGoogleConfig = {
+    baseURL: "http://localhost:28027",
+    headers: {
+        'Authorization': localStorage.getItem('token')
+    }
+}

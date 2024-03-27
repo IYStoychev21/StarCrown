@@ -28,3 +28,7 @@ target/
 *.exe
 *.exe~
 .fleet
+
+venv
+
+__pycache__/
