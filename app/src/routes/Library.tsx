@@ -18,6 +18,7 @@ import { readTextFile, BaseDirectory, writeTextFile } from '@tauri-apps/api/fs'
 import GameSave from '@/components/GameSave'
 import { convertNumberToCol } from '@/utils/numToCol'
 import { googleDriveAPI } from '@/apis/googleDriveAPI'
+import SyncSaves from '@/components/SyncSaves'
 
 export default function Library() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -106,6 +107,8 @@ export default function Library() {
     return (
         <>
             <div className='min-w-screen min-h-screen flex flex-col'>
+                <SyncSaves />
+
                 <div className='text-white font-bold ml-8 mt-8 flex flex-col gap3'>
                     <h1 className='text-3xl'>Your Save Library</h1>
 
