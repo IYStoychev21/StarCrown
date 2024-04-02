@@ -6,11 +6,9 @@ export default function Protected({children}: any) {
     let [isLoggedIn, setIsLoggedIn] = useState(true);
     
     useEffect(() => {
-        userAPI.getCurrentUser().then(() => {
-            setIsLoggedIn(true)
-        }).catch(() => {
+        if(localStorage.getItem('token') === null) {
             setIsLoggedIn(false)
-        })
+        }
     }, [])
     
     if(!isLoggedIn)

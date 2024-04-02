@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { open } from '@tauri-apps/api/dialog'
 import { Button } from '@/components/ui/button'
 import { readTextFile, BaseDirectory, writeTextFile } from '@tauri-apps/api/fs'
+import { documentDir } from '@tauri-apps/api/path'
 import GameSave from '@/components/GameSave'
 import { convertNumberToCol } from '@/utils/numToCol'
 import { googleDriveAPI } from '@/apis/googleDriveAPI'
@@ -97,17 +98,22 @@ export default function Library() {
         }).then((path) => {
             if (path) {
                 setGameSavesPath(path)
-                console.log(path)
             } else {
                 return
             }
         })
     }
 
+    const handleSyncTo = async () => {
+        googleDriveAPI.syncTo(`${await documentDir()}\\StarCrown\\library.json`).then(() => {
+            console.log('Synced to Google Drive')
+        })
+    }
+
     return (
         <>
             <div className='min-w-screen min-h-screen flex flex-col'>
-                <SyncSaves />
+                <SyncSaves syncTo={handleSyncTo} />
 
                 <div className='text-white font-bold ml-8 mt-8 flex flex-col gap3'>
                     <h1 className='text-3xl'>Your Save Library</h1>
