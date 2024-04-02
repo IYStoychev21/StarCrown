@@ -43,8 +43,10 @@ def folder_exists(service, folder_name, parent_folder_id=None):
 
 @app.get("/init/config")
 def init(request: Request):
-    token = request.headers["Authorization"]
-    creds = Credentials(token)
+    token = request.headers["Authorization"].split(" ")[0]
+    refresh_token = request.headers["Authorization"].split(" ")[1]
+
+    creds = Credentials(token, refresh_token)
 
     service = build('drive', 'v3', credentials=creds)
     starCrownId = 0
@@ -75,10 +77,12 @@ def init(request: Request):
 
 @app.post("/sync/to")
 async def syncTo(request: Request):
-    token = request.headers["Authorization"]
     body = await request.json()
 
-    creds = Credentials(token)
+    token = request.headers["Authorization"].split(" ")[0]
+    refresh_token = request.headers["Authorization"].split(" ")[1]
+
+    creds = Credentials(token, refresh_token)
 
     service = build('drive', 'v3', credentials=creds)
 
@@ -190,9 +194,12 @@ async def syncTo(request: Request):
 
 @app.post("/sync/from")
 async def syncFrom(request: Request):
-    token = request.headers["Authorization"]
     body = await request.json()
-    creds = Credentials(token)
+
+    token = request.headers["Authorization"].split(" ")[0]
+    refresh_token = request.headers["Authorization"].split(" ")[1]
+
+    creds = Credentials(token, refresh_token)
 
     service = build('drive', 'v3', credentials=creds)
 

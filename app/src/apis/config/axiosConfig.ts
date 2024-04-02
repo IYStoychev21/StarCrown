@@ -9,6 +9,6 @@ export const axiosConfig = {
 export const axiosGoogleConfig = {
     baseURL: "http://localhost:28027",
     headers: {
-        'Authorization': localStorage.getItem('token')
+        'Authorization': localStorage.getItem('token') + ' ' + localStorage.getItem('refreshToken')
     }
 }

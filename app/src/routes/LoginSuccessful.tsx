@@ -1,15 +1,15 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function LoginSuccessful() {
     let navigator = useNavigate()
+    let [queryParam] = useSearchParams()
 
     useEffect(() => {
-        axios.get(`${import.meta.env.VITE_BACKEND_URL}/token`).then((res) => {
-            localStorage.setItem('token', res.data.token)
-            navigator('/library')
-        })
+        localStorage.setItem('token', queryParam.get('token') as string)
+        localStorage.setItem('refreshToken', queryParam.get('refresh') as string)
+
+        navigator('/library')
     }, [])
 
     return (

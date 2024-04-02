@@ -116,6 +116,7 @@ export default function Library() {
 
     return (
         <>
+            {/* <Button onClick={() => {window.location.href = "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=http://localhost:5173/"}}>Logout Test</Button> */}
             <div className='min-w-screen min-h-screen flex flex-col'>
                 <SyncSaves syncTo={handleSyncTo} syncFrom={handleSyncFrom}/>
 

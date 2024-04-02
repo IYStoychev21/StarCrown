@@ -23,11 +23,9 @@ func setupGoogleOAuthConfig() *oauth2.Config {
 func HandleLoging(c *gin.Context) {
 	googleOauthConfig := setupGoogleOAuthConfig()
 
-	url := googleOauthConfig.AuthCodeURL(os.Getenv("OAUTHSTATESTRING"))
+	url := googleOauthConfig.AuthCodeURL(os.Getenv("OAUTHSTATESTRING"), oauth2.AccessTypeOffline)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
-
-var googleToken *oauth2.Token
 
 func HandleGoogleCallback(c *gin.Context) {
 	code := c.Query("code")
@@ -40,18 +38,11 @@ func HandleGoogleCallback(c *gin.Context) {
 		return
 	}
 
-	googleToken = token
-
 	if os.Getenv("MODE") == "dev" {
-		c.Redirect(http.StatusTemporaryRedirect, "http://localhost:5173/login/success")
+		c.Redirect(http.StatusTemporaryRedirect, "http://localhost:5173/login/success?token="+token.AccessToken+"&refresh="+token.RefreshToken)
 	} else {
-		c.Redirect(http.StatusTemporaryRedirect, "https://tauri.localhost/login/success")
+		c.Redirect(http.StatusTemporaryRedirect, "https://tauri.localhost/login/success?token="+token.AccessToken+"&refresh="+token.RefreshToken)
 	}
-}
-
-func GetToken(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"token": googleToken.AccessToken})
-	googleToken = nil
 }
 
 type User struct {
