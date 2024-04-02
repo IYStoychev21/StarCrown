@@ -8,4 +8,7 @@ export const googleDriveAPI = {
     syncTo: async (filePath: string) => {
         return (await axios.post('/sync/to', {filePath}, axiosGoogleConfig)).data;
     },
+    syncFrom: async (filePath: string) => {
+        return (await axios.post('/sync/from', {filePath}, axiosGoogleConfig)).data;
+    }
 };

@@ -105,15 +105,19 @@ export default function Library() {
     }
 
     const handleSyncTo = async () => {
-        googleDriveAPI.syncTo(`${await documentDir()}\\StarCrown\\library.json`).then(() => {
-            console.log('Synced to Google Drive')
+        googleDriveAPI.syncTo(`${await documentDir()}\\StarCrown\\library.json`).then(() => {})
+    }
+
+    const handleSyncFrom = async () => {
+        googleDriveAPI.syncFrom(`${await documentDir()}\\StarCrown\\library.json`).then(() => {
+            window.location.reload()
         })
     }
 
     return (
         <>
             <div className='min-w-screen min-h-screen flex flex-col'>
-                <SyncSaves syncTo={handleSyncTo} />
+                <SyncSaves syncTo={handleSyncTo} syncFrom={handleSyncFrom}/>
 
                 <div className='text-white font-bold ml-8 mt-8 flex flex-col gap3'>
                     <h1 className='text-3xl'>Your Save Library</h1>

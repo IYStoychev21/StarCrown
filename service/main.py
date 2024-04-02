@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from fastapi.middleware.cors import CORSMiddleware
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 
 import json
 import os
@@ -186,3 +186,64 @@ async def syncTo(request: Request):
     )
 
     return {"details": "Synced to StarCrown", "folder_id": file.get("id")}
+
+
+@app.post("/sync/from")
+async def syncFrom(request: Request):
+    token = request.headers["Authorization"]
+    body = await request.json()
+    creds = Credentials(token)
+
+    service = build('drive', 'v3', credentials=creds)
+
+    query = "mimeType='application/vnd.google-apps.folder' and name='StarCrown' and trashed=false"
+    files = service.files().list(q=query, spaces='drive', fields='files(id, name)').execute().get('files', [])
+    parant_folder_id = files[0].get('id')
+
+    query = f"name='library.json' and '{parant_folder_id}' in parents and trashed=false"
+    files = service.files().list(q=query, spaces='drive', fields='files(id, name)').execute().get('files', [])
+
+    if files:
+        file = files[0]
+        file_id = file.get('id')
+
+        request = service.files().get_media(fileId=file_id)
+
+        fh = open(body["filePath"], "wb")
+
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+
+        while done is False:
+            status, done = downloader.next_chunk()
+
+        fh.close()
+
+        with open(body["filePath"], "r") as f:
+            data = json.load(f)
+
+        for game in data:
+            query = "name='" + game['path'].split('\\')[-1] + f"' and trashed=false"
+            files = service.files().list(q=query, spaces='drive', fields='files(id, name)').execute().get('files', [])
+
+            os.makedirs(game['path'], exist_ok=True)
+
+            for f in files:
+                files_in_folder = service.files().list(q=f"'{f.get('id')}' in parents and trashed=false").execute().get('files', [])
+
+                for file in files_in_folder:
+                    request = service.files().get_media(fileId=file.get('id'))
+
+                    fh = open(game['path'] + "\\" + file.get('name'), "wb")
+
+                    downloader = MediaIoBaseDownload(fh, request)
+                    done = False
+
+                    while done is False:
+                        status, done = downloader.next_chunk()
+
+                    fh.close()
+        
+        return {"details": "Synced from StarCrown"}
+
+    return {"details": "No library.json file found"}
