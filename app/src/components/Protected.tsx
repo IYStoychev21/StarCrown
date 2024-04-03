@@ -5,10 +5,12 @@ import { userAPI } from '../apis/userAPI';
 export default function Protected({children}: any) { 
     let [isLoggedIn, setIsLoggedIn] = useState(true);
     
-    useEffect(() => {
-        if(localStorage.getItem('token') === null) {
+    useEffect(() => { 
+        userAPI.getCurrentUser().then(() => {
+            setIsLoggedIn(true)
+        }).catch(() => {
             setIsLoggedIn(false)
-        }
+        })
     }, [])
     
     if(!isLoggedIn)

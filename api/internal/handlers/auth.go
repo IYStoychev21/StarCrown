@@ -45,6 +45,34 @@ func HandleGoogleCallback(c *gin.Context) {
 	}
 }
 
+func LogOut(c *gin.Context) {
+	token := c.Request.Header.Get("Authorization")
+
+	resp, err := http.Get("https://accounts.google.com/o/oauth2/revoke?token=" + token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to revoke token"})
+		return
+	}
+
+	defer resp.Body.Close()
+
+	c.JSON(http.StatusOK, gin.H{"message": "Token revoked"})
+}
+
+func RefreshToken(c *gin.Context) {
+	token := c.Query("refresh")
+
+	googleOauthConfig := setupGoogleOAuthConfig()
+
+	newToken, err := googleOauthConfig.TokenSource(c, &oauth2.Token{RefreshToken: token}).Token()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to refresh token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": newToken.AccessToken, "refresh": newToken.RefreshToken})
+}
+
 type User struct {
 	UserName string `json:"name"`
 	FirsName string `json:"given_name"`

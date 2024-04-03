@@ -20,8 +20,11 @@ import GameSave from '@/components/GameSave'
 import { convertNumberToCol } from '@/utils/numToCol'
 import { googleDriveAPI } from '@/apis/googleDriveAPI'
 import SyncSaves from '@/components/SyncSaves'
+import { useNavigate } from 'react-router-dom'
 
 export default function Library() {
+    const navigator = useNavigate()
+
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [userInfo, setUserInfo] = useState<UserType>()
     const [allGames, setAllGames] = useState<GameType[]>([])
@@ -52,7 +55,14 @@ export default function Library() {
             setAllGames(games)
         })
 
-        googleDriveAPI.initGoogleConfig().then(() => {})
+        googleDriveAPI.initGoogleConfig().then(() => {}).catch(() => {
+            userAPI.refreshToken().then((res) => {
+                localStorage.setItem('token', res.token)
+                localStorage.setItem('refreshToken', res.refresh)
+
+                window.location.reload()
+            })
+        })
 
         if (games.length === 0) {
             readTextFile('StarCrown/library.json', { dir: BaseDirectory.Document }).then((data) => {
@@ -105,18 +115,32 @@ export default function Library() {
     }
 
     const handleSyncTo = async () => {
-        googleDriveAPI.syncTo(`${await documentDir()}\\StarCrown\\library.json`).then(() => {})
+        googleDriveAPI.syncTo(`${await documentDir()}\\StarCrown\\library.json`).then(() => {}).catch(() => {
+            userAPI.refreshToken().then((res) => {
+                localStorage.setItem('token', res.token)
+                localStorage.setItem('refreshToken', res.refresh)
+
+                window.location.reload()
+            })
+        })
     }
 
     const handleSyncFrom = async () => {
         googleDriveAPI.syncFrom(`${await documentDir()}\\StarCrown\\library.json`).then(() => {
             window.location.reload()
+        }).catch(() => {
+            userAPI.refreshToken().then((res) => {
+                localStorage.setItem('token', res.token)
+                localStorage.setItem('refreshToken', res.refresh)
+
+                window.location.reload()
+            })
         })
     }
 
     return (
         <>
-            {/* <Button onClick={() => {window.location.href = "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=http://localhost:5173/"}}>Logout Test</Button> */}
+            {/* <Button onClick={() => {userAPI.logOut().then(() => {localStorage.removeItem("token"); navigator("/")})}}>LogOut</Button> */}
             <div className='min-w-screen min-h-screen flex flex-col'>
                 <SyncSaves syncTo={handleSyncTo} syncFrom={handleSyncFrom}/>
 
@@ -127,7 +151,7 @@ export default function Library() {
                         {
                             games.map((game) => {
                                 return (
-                                    <GameSave gameId={game.gameId} />
+                                    <GameSave removeGame={() => {setGames(games.filter(toCheck => {return toCheck.gameId !== game.gameId})); window.location.reload()}} gameId={game.gameId} />
                                 )
                             })
                         }

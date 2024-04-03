@@ -1,9 +1,17 @@
 import { useEffect } from 'react'
 import { Button } from '../components/ui/button'
 import { createDir, BaseDirectory } from '@tauri-apps/api/fs';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
+    const navigator = useNavigate()
+
     const handleLogin = () => {
+        if(localStorage.getItem('token') !== null) {
+            navigator("/library")
+            return
+        }
+        
         window.location.href = import.meta.env.VITE_BACKEND_URL + '/login'
     }
 
