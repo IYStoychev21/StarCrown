@@ -21,8 +21,15 @@ jobs:
       with:
         go-version: 1.22
 
+    - name: Install dependencies
+      run: | 
+        cd api
+        go get cmd/server
+
     - name: Build
-      run: go build api/cmd/server -o api/build/server.out
+      run: |
+        cd api
+        go build cmd/server -o build/server.out
       
     - name: Zip artifact for deployment
       run: zip api/release.zip ./* -r
