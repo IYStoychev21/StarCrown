@@ -24,7 +24,9 @@ jobs:
     - name: Install dependencies
       run: | 
         cd api
-        go get cmd/server
+        cd cmd
+        cd server
+        go get .
 
     - name: Build
       run: |
