@@ -9,8 +9,6 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 import { Button } from "./ui/button"
-import { BaseDirectory, writeTextFile } from '@tauri-apps/api/fs'
-import { GameSaveType } from "@/shared.types"
 
 export default function GameSave({ gameId, removeGame }: { gameId: number, removeGame: () => void }) {
     const [isHovered, setIsHovered] = useState(false)

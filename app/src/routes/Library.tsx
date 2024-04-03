@@ -20,11 +20,9 @@ import GameSave from '@/components/GameSave'
 import { convertNumberToCol } from '@/utils/numToCol'
 import { googleDriveAPI } from '@/apis/googleDriveAPI'
 import SyncSaves from '@/components/SyncSaves'
-import { useNavigate } from 'react-router-dom'
+import Profile from '@/components/Profile'
 
 export default function Library() {
-    const navigator = useNavigate()
-
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [userInfo, setUserInfo] = useState<UserType>()
     const [allGames, setAllGames] = useState<GameType[]>([])
@@ -193,9 +191,10 @@ export default function Library() {
                                 </div>
                             </DialogContent>
                         </Dialog>
-
                     </div>
                 </div>
+
+                <Profile user={userInfo} />
             </div>
         </>
     )
